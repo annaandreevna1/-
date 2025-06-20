@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" style="margin-top: 4.5rem;">
+  <h2>Добавление родителя</h2>
+  <div class="form-group">
+    <label for="first-name">Фамилия</label>
+    <input type="text" class="form-control" id="first-name-input" name="first-name" placeholder="Пупкин">
+  </div>
+  <div class="form-group">
+    <label for="last-name">Имя</label>
+    <input type="text" class="form-control" id="last-name-input" name="last-name" placeholder="Василий">
+  </div>
+  <div class="form-group">
+    <label for="patronymic">Отчество</label>
+    <input type="text" class="form-control" id="patronymic-input" name="patronymic" placeholder="Иванович">
+  </div>
+  <div class="form-group">
+    <label for="name_children">Имя ребенка</label>
+    <input type="text" class="form-control" id="name_children-input" name="name_children" placeholder="Геннадий">
+  </div>
+  <button type="submit" class="btn btn-success mt-2">Добавить</button>
+</form>
+{% endblock %}
