@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for, jsonify, flash, s
 from . import db
 from .models import User, Parent, Event
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import requests
 
 def init_routes(app):
     @app.errorhandler(404)
@@ -28,6 +29,7 @@ def init_routes(app):
             user = User()
             user.username = request.form["username"]
             user.password = request.form["password"]
+            user.telegram_id = request.form["telegram_id"]
             db.session.add(user)
             db.session.commit()
             return redirect("/users")
@@ -158,8 +160,37 @@ def init_routes(app):
     @login_required
     def events():
         events = Event.query.all()
-        
+
         return render_template('events.html', current="events", events=events)
+    
+    def send_event_telegram(event):
+        users = User.query.all()
+        msg = f"{event.name}\n{event.description}"
+        url = f"http://{app.config['TELEGRAM_URL']}/send_notification"
+        headers = {"X-API-KEY": app.config['TELEGRAM_API_KEY']}
+        for user in users:
+            if user.telegram_id == None : continue
+            data = {
+                "user_id": user.telegram_id,  # ID пользователя из Telegram
+                "message": msg
+            }
+            try:
+                response = requests.post(url, json=data, headers=headers)
+                if response.status_code != 200:
+                    print(f"Ошибка отправки сообщения {data}")
+            except requests.exceptions.ConnectionError as e:
+                print(f"Ошибка подключения к Telegram Bot")
+    
+    @app.route('/event/add', methods=["GET", "POST"])
+    def event_add():
+        if request.method == "POST":
+            event = Event()
+            event.name = request.json["name"]
+            event.description = request.json["description"]
+            db.session.add(event)
+            db.session.commit()
+            send_event_telegram(event)
+            return make_response("", 200)
 
     @app.route('/login', methods=['GET', 'POST'])
     def login():

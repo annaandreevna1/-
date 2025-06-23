@@ -5,6 +5,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    telegram_id = db.Column(db.String(60), nullable=True)
     is_active = db.Column(db.Boolean, default=True,  nullable=False)
 
     def get_id(self):
